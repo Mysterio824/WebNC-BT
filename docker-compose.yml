@@ -1,0 +1,19 @@
+services:
+  webnc-mysql:
+    image: mysql:8.0
+    container_name: webnc-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: webnc_db # Note: This DB will be created, and then your script will run
+    volumes:
+      # This volume persists the actual database data
+      - mysql-data:/var/lib/mysql
+      # This volume mounts your local SQL file into the init directory
+      # The :ro flag makes it read-only, which is good practice
+      - ./sakila-mysql.sql:/docker-entrypoint-initdb.d/sakila-mysql.sql:ro
+
+volumes:
+  mysql-data:
+  # This just defines the named volume
