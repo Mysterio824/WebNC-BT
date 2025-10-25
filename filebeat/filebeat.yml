@@ -1,0 +1,21 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      # This path is *inside* the Filebeat container
+      - /var/log/my-app/*.log
+
+    # Tell Filebeat your logs are JSON
+    # This makes parsing much easier
+    json.keys_under_root: true
+    json.add_error_key: true
+    json.message_key: message
+
+# ----------------- Output -----------------
+# Send logs to Logstash (not Elasticsearch directly)
+output.logstash:
+  hosts: ["logstash:5044"]
+
+# Disable Elasticsearch output
+# output.elasticsearch:
+#   hosts: ["elasticsearch:9200"]

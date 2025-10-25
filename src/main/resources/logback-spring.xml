@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <appender name="ELK_JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/my-app.log</file>
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <appName>my-spring-boot-app</appName>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/my-app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="api.logger" level="INFO" additivity="false">
+        <appender-ref ref="ELK_JSON_FILE" />
+    </logger>
+
+</configuration>

@@ -6,14 +6,54 @@ services:
       - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: webnc_db # Note: This DB will be created, and then your script will run
+      MYSQL_DATABASE: webnc_db
     volumes:
-      # This volume persists the actual database data
       - mysql-data:/var/lib/mysql
-      # This volume mounts your local SQL file into the init directory
-      # The :ro flag makes it read-only, which is good practice
       - ./sakila-mysql.sql:/docker-entrypoint-initdb.d/sakila-mysql.sql:ro
+
+  elasticsearch:
+    image: elasticsearch:8.10.4
+    container_name: es01
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Set heap size (optional)
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  logstash:
+    image: logstash:8.10.4
+    container_name: logstash01
+    ports:
+      - "5044:5044" # Port for Filebeat input
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:8.10.4
+    container_name: kibana01
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    image: elastic/filebeat:8.10.4
+    container_name: filebeat01
+    user: root
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs:/var/log/my-app:ro
+    depends_on:
+      - logstash
 
 volumes:
   mysql-data:
+  esdata:
   # This just defines the named volume
