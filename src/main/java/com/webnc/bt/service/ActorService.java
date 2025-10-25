@@ -5,42 +5,38 @@ import com.webnc.bt.dto.response.ActorResponse;
 import com.webnc.bt.entity.Actor;
 import com.webnc.bt.exception.AppException;
 import com.webnc.bt.exception.ErrorCode;
+import com.webnc.bt.mapper.ActorMapper;
 import com.webnc.bt.repository.ActorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ActorService {
 
     private final ActorRepository actorRepository;
+    private final ActorMapper actorMapper;
 
     @Transactional(readOnly = true)
     public List<ActorResponse> getAllActors() {
-        return actorRepository.findAll().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        return actorMapper.toDtoList(actorRepository.findAll());
     }
 
     @Transactional(readOnly = true)
     public ActorResponse getActorById(Integer id) {
         Actor actor = actorRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ACTOR_NOT_FOUND));
-        return convertToDto(actor);
+        return actorMapper.toDto(actor);
     }
 
     @Transactional
     public ActorResponse createActor(ActorRequest actorRequest) {
-        Actor actor = new Actor();
-        actor.setFirstName(actorRequest.getFirstName());
-        actor.setLastName(actorRequest.getLastName());
-
+        Actor actor = actorMapper.toEntity(actorRequest);
         Actor savedActor = actorRepository.save(actor);
-        return convertToDto(savedActor);
+        return actorMapper.toDto(savedActor);
     }
 
     @Transactional
@@ -48,11 +44,9 @@ public class ActorService {
         Actor actor = actorRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ACTOR_NOT_FOUND));
 
-        actor.setFirstName(actorRequest.getFirstName());
-        actor.setLastName(actorRequest.getLastName());
-
+        actorMapper.updateEntityFromDto(actorRequest, actor);
         Actor updatedActor = actorRepository.save(actor);
-        return convertToDto(updatedActor);
+        return actorMapper.toDto(updatedActor);
     }
 
     @Transactional
@@ -60,14 +54,5 @@ public class ActorService {
         Actor actor = actorRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ACTOR_NOT_FOUND));
         actorRepository.delete(actor);
-    }
-
-    private ActorResponse convertToDto(Actor actor) {
-        return ActorResponse.builder()
-                .actorId(actor.getActorId())
-                .firstName(actor.getFirstName())
-                .lastName(actor.getLastName())
-                .lastUpdate(actor.getLastUpdate())
-                .build();
     }
 }

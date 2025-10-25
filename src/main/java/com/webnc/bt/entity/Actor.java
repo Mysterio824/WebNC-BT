@@ -2,13 +2,16 @@ package com.webnc.bt.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "actor")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Actor {
 
     @Id
@@ -23,5 +26,5 @@ public class Actor {
     private String lastName;
 
     @Column(name = "last_update", nullable = false, insertable = false, updatable = false)
-    private LocalDateTime lastUpdate;
+    private Instant lastUpdate;
 }

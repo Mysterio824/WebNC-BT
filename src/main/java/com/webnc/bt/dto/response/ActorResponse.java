@@ -1,17 +1,18 @@
 package com.webnc.bt.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
-@Getter
-@Setter
+import java.time.Instant;
+
 @Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ActorResponse {
 
     private Integer actorId;
     private String firstName;
     private String lastName;
-    private LocalDateTime lastUpdate;
+    private Instant lastUpdate;
 }
