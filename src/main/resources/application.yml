@@ -2,6 +2,8 @@ server:
   port: 8888
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: bt
   datasource:
@@ -13,3 +15,14 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+
+oauth2:
+  google:
+    client-id: ${CLIENT_ID}
+    client-secret: ${CLIENT_SECRET}
+
+jwt:
+  secret:
+    key: ${JWT_SECRET}
+  expiration:
+    ms: 36000000
